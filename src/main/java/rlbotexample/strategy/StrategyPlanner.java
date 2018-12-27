@@ -25,6 +25,7 @@ public class StrategyPlanner {
     public static final int FIELD_WIDTH = 3000;
     public static final int FIELD_DEPTH = 5125;
     public static final int FIELD_HEIGHT = 3000;
+    public static final int DISTANCE_FOR_MOVING = 2500;
     private static final int AIM_DISTANCE = 125;
 
     public Strategy state;
@@ -34,6 +35,7 @@ public class StrategyPlanner {
     public static boolean isClosest;
     private boolean badPosition;
     private boolean kickOff;
+    private boolean defending;
     private Vector3 ballPosition;
     private Vector3 carPosition;
     private Vector3 carDirection;
@@ -90,7 +92,8 @@ public class StrategyPlanner {
         positionFromBall = ballPosition.y - carPosition.y;
 
         // logic for repositioning
-        calculateBadPosition(team, positionFromBall, ballPosition.y);
+        calculateBadPosition(team, positionFromBall);
+        calculateDefending(team, ballPosition);
 
         try {
             ballPath = new BallPath(RLBotDll.getBallPrediction());
@@ -120,21 +123,43 @@ public class StrategyPlanner {
         }
     }
 
-    public void calculateBadPosition(int team, double positionFromBall, double ballYPosition){
+    public void calculateBadPosition(int team, double positionFromBall){
         if(team == 0 && positionFromBall < 0){
-            if(ballPosition.y > -Positioning.MAXDISTANCE) {
+            if(ballPosition.y > -Positioning.MAXDISTANCE && ballDistance < DISTANCE_FOR_MOVING) {
                 badPosition = true;
             } else {
                 badPosition = false;
             }
         } else if(team == 1 && positionFromBall > 0){
-            if(ballPosition.y < Positioning.MAXDISTANCE) {
+            if(ballPosition.y < Positioning.MAXDISTANCE  && ballDistance < DISTANCE_FOR_MOVING) {
                 badPosition = true;
             } else {
                 badPosition = false;
             }
         } else {
             badPosition = false;
+        }
+    }
+
+    /**
+     * This method calculates if we should be defending, if we should then we set the boolean for
+     * defending to true.
+     * @param team the team we are on.
+     * @param ballPosition the current position of the ball
+     */
+    public void calculateDefending(int team, Vector3 ballPosition){
+        if(team == 0){
+            if(ballPosition.y < -2500){
+                defending = true;
+            } else {
+                defending = false;
+            }
+        } else {
+            if(ballPosition.y > 2500){
+                defending = true;
+            } else {
+                defending = false;
+            }
         }
     }
 
@@ -168,7 +193,8 @@ public class StrategyPlanner {
      * @param newState
      */
     public void setState(Strategy newState){
-        if(!state.getStrategy().equals(newState.getStrategy()) && !state.isBusy()) {
+        //defending has priority for now
+        if(!state.getStrategy().equals(newState.getStrategy()) && (!state.isBusy() || defending)) {
             state = newState;
         }
     }
@@ -192,9 +218,11 @@ public class StrategyPlanner {
     private void chooseState(DataPacket input){
         if(kickOff){
             setState(new KickOff());
+        } else if(defending){
+            setState(new Defending());
         } else if(badPosition && !state.isBusy()){
             setState(new Positioning());
-        } else if(ballDistance > 2250){
+        } else if(ballDistance > DISTANCE_FOR_MOVING){
             setState(new MoveToBall());
         } else if(predictedBallPosition.z <= 125 && ballDistance < 365 || !isClosest){
             setState(new PowerShot());

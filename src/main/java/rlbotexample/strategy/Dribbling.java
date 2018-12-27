@@ -48,9 +48,10 @@ public class Dribbling implements Strategy {
                     .withSteer(0);
         }
 
-        if(input.car.velocity.magnitude() > REGULAR_SPEED){
-            throttle = -1;
-        }
+        // This makes sure your speed is 1400 when necesarry
+//        if(input.car.velocity.magnitude() > REGULAR_SPEED){
+//            throttle = -1;
+//        }
 
 
         // stop boosting in move

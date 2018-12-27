@@ -54,9 +54,10 @@ public class PowerShot implements Strategy {
         }
 
         // if we go too fast we slow down
-        if(input.car.velocity.magnitude() > REGULAR_SPEED){
-            return Utilities.move(steerCorrectionRadians, -1, false);
-        }
+//        if(input.car.velocity.magnitude() > REGULAR_SPEED){
+//            return Utilities.move(steerCorrectionRadians, -1, false);
+//        }
+
         //move normally if all else fails
         return Utilities.move(steerCorrectionRadians, 1, false);
     }

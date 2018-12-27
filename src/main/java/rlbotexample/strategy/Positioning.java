@@ -9,7 +9,7 @@ import rlbotexample.vector.Vector3;
 public class Positioning implements Strategy {
 
     private boolean isDoingMove;
-    private final static int DISTANCE_AWAY_FROM_BALL = 1000;
+    private final static int DISTANCE_AWAY_FROM_BALL = 1050;
     private final static int DODGEDISTANCE = 1000;
     private final static int NO_DODGE_AFTER_POINT = 3500;
     public final static int MAXDISTANCE = 3500;
@@ -23,18 +23,27 @@ public class Positioning implements Strategy {
     }
 
 
+    /**
+     * This method calculates the position the car needs to move to, for a good shot at goal.
+     * @param carPosition the current car position.
+     * @param ballPosition the current ball position.
+     * @param team the team we are on.
+     * @return the location the car needs to move towards.
+     */
     private Vector3 calculateTargetPosition(Vector3 carPosition, Vector3 ballPosition, int team){
         double distanceFromBall = ballPosition.y - carPosition.y;
         Vector3 targetPosition;
         // move to a spot away from ball
         if(team == 0){
-            targetPosition = StrategyPlanner.predictedBallPosition.minus(new Vector3(0, DISTANCE_AWAY_FROM_BALL, 0));
-            if(distanceFromBall >= DISTANCE_AWAY_FROM_BALL-5 || ballPosition.y <= -MAXDISTANCE){
+            targetPosition = StrategyPlanner.predictedBallPosition.minus(new Vector3(0,
+                    DISTANCE_AWAY_FROM_BALL, 0));
+            if(distanceFromBall >= DISTANCE_AWAY_FROM_BALL+150 || ballPosition.y <= -MAXDISTANCE){
                 isDoingMove = false;
             }
         } else {
-            targetPosition = StrategyPlanner.predictedBallPosition.minus(new Vector3(0, -DISTANCE_AWAY_FROM_BALL, 0));
-            if(distanceFromBall <= -DISTANCE_AWAY_FROM_BALL+5  || ballPosition.y >= MAXDISTANCE){
+            targetPosition = StrategyPlanner.predictedBallPosition.plus(new Vector3(0,
+                    DISTANCE_AWAY_FROM_BALL, 0));
+            if(distanceFromBall <= -DISTANCE_AWAY_FROM_BALL-150  || ballPosition.y >= MAXDISTANCE){
                 isDoingMove = false;
             }
         }
@@ -63,7 +72,7 @@ public class Positioning implements Strategy {
         double distanceFromBall = ballPosition.y - carPosition.y;
         double ballDistance = carPosition.flatten().distance(ballPosition.flatten());
 
-        if(ballDistance > 3000){
+        if(ballDistance > StrategyPlanner.DISTANCE_FOR_MOVING){
             isDoingMove = false;
         }
 

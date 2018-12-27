@@ -13,7 +13,11 @@ public class CarDistance {
 
     public static double maxDistance(double seconds, CarData car, Vector3 targetLocation) {
         final double currentSpeed = car.velocity.magnitude();
-        final double velocityTillMaxSpeed = REGULAR_SPEED - currentSpeed;
+        double speed = REGULAR_SPEED;
+        if(currentSpeed > speed){
+            speed = currentSpeed;
+        }
+        final double velocityTillMaxSpeed = speed - currentSpeed;
         final double secondsTillMaxSpeed = velocityTillMaxSpeed / ACCELERATION;
 
         final double secondsForFirstPart = Math.min(seconds, secondsTillMaxSpeed);
@@ -27,7 +31,7 @@ public class CarDistance {
 
         final double secondsForSecondPart = seconds - secondsTillMaxSpeed;
 
-        final double distanceDuringCruise = REGULAR_SPEED * secondsForSecondPart;
+        final double distanceDuringCruise = speed * secondsForSecondPart;
 
         return distanceDuringAccel + distanceDuringCruise;
     }

@@ -8,7 +8,7 @@ import javax.naming.ldap.Control;
 
 public class DodgeToPoint implements Move{
 
-    private static final int MAXTIMEOUT = 2000;
+    private static final int MAXTIMEOUT = 750;
     private static final int NODODGEDISTANCE = 40;
 
     private boolean doingMove;
@@ -90,9 +90,9 @@ public class DodgeToPoint implements Move{
             return jumpDirection(onGround, -1, 0, 0);
         } else if(steerCorrectionRadians < -1.00){
             return jumpDirection(onGround, 1, 0, 0);
-        } else if(steerCorrectionRadians > 0.20){
+        } else if(steerCorrectionRadians > 0.15){
             return jumpDirection(onGround, -1, -1, 0);
-        } else if(steerCorrectionRadians < -0.20){
+        } else if(steerCorrectionRadians < -0.15){
             return jumpDirection(onGround, 1, -1, 0);
         } else{
             return jumpDirection(onGround, 0, -1, 0);
